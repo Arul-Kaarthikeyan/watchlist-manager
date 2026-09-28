@@ -32,9 +32,11 @@ const movieSchema = new mongoose.Schema(
 const Movie = mongoose.model("Movie", movieSchema);
 
 // ---------- Firebase auth middleware ----------
-admin.initializeApp({
-  credential: admin.credential.cert(require(process.env.FIREBASE_KEY_PATH)),
-});
+const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)   // hosted
+  : require(process.env.FIREBASE_KEY_PATH);            // local
+
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
 async function auth(req, res, next) {
   const token = (req.headers.authorization || "").replace("Bearer ", "");
